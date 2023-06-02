@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/pizzas")
 public class PizzaController {
 
     private final PizzaService pizzaService;
@@ -18,28 +19,30 @@ public class PizzaController {
         this.pizzaService = pizzaService;
     }
 
-    @GetMapping("/pizzas")
+    @GetMapping("")
     public ResponseEntity<PizzaResponse[]> getAllPizzas() {
-
         PizzaResponse[] pizzas = pizzaService.getPizzas();
-
         return ResponseEntity.status(HttpStatus.OK).body(pizzas);
     }
 
-    @GetMapping("/pizzas/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<PizzaResponse> getPizzaById(@PathVariable int id) {
-
         PizzaResponse pizza = pizzaService.getPizzaById(id);
-
         return ResponseEntity.status(HttpStatus.OK).body(pizza);
     }
-
-    @PostMapping("/pizzas")
+    @PostMapping("")
     public ResponseEntity<PizzaResponse> addPizza(@RequestBody PizzaRequest pizza) {
-
         PizzaResponse pizzaResponse = pizzaService.addPizza(pizza);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(pizzaResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletePizza(@PathVariable int id) {
+
+        pizzaService.deletePizza(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Pizza deleted successfully");
     }
 
     @ExceptionHandler(RuntimeException.class)

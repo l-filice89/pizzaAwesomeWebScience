@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class OrderService {
@@ -55,7 +56,8 @@ public class OrderService {
                 orderRepo.save(orderEntity);
                 orderDetailsRepo.deleteByOrderId(orderId);
                 break;
-            }}
+            }
+        }
         return modelMapper.map(orderEntity, OrderResponse.class);
     }
 
@@ -65,6 +67,7 @@ public class OrderService {
 
         return modelMapper.map(orders, OrderResponse[].class);
     }
+
     public OrderDetailKitchenResponse[] getOrderDetailById(int id) {
 
         OrderDetailKitchen[] orderDetailsKitchen = orderDetailKitchenRepo.getOrderDetailsForKitchen(id);
@@ -85,6 +88,7 @@ public class OrderService {
 
         return modelMapper.map(orders, OrderResponse[].class);
     }
+
     public int getOldestOrderId() {
 
         ExampleMatcher customExampleMatcher = ExampleMatcher.matchingAny()
@@ -115,7 +119,9 @@ public class OrderService {
 
         if (orderRepo.findAll(example).toArray(new Order[0]).length > 0) {
             throw new IllegalArgumentException("Another order is being prepared");
-        }}
+        }
+    }
+
     private Example<Order> generateStatusExample(String status) {
         Order sampleOrder = new Order();
         sampleOrder.setStatus(status);
@@ -127,36 +133,43 @@ public class OrderService {
             case "ordered" -> {
                 if (!newStatus.equals("cancelled") && !newStatus.equals("preparing")) {
                     throw new IllegalArgumentException("Invalid status change");
-                }}
+                }
+            }
             case "preparing" -> {
                 if (!newStatus.equals("delivering")) {
                     throw new IllegalArgumentException("Invalid status change");
-                }}
+                }
+            }
             case "delivering" -> {
                 if (!newStatus.equals("delivered")) {
                     throw new IllegalArgumentException("Invalid status change");
-                }}
+                }
+            }
             default -> throw new IllegalArgumentException("Invalid status change");
-        }}
-    public OrderResponse getOrderById(int id) {
-        Order order = orderRepo.findById(id).get();
-        return modelMapper.map(order, OrderResponse.class);
+        }
     }
+
+    public OrderResponse getOrderById(int id) {
+        Optional<Order> optionalOrder = orderRepo.findById(id);
+        if (optionalOrder.isPresent()) {
+            return modelMapper.map(optionalOrder.get(), OrderResponse.class);
+        } else {
+            throw new NoSuchElementException("Order not found");
+        }
+    }
+
     public OrderResponse[] getOngoingOrders() {
         Order[] orders = orderRepo.getOngoingOrders();
         return modelMapper.map(orders, OrderResponse[].class);
     }
-    public OrderResponse[] getQueryByStatus(String status) {
+
+    public OrderResponse[] getOrdersByStatus(String status) {
         Example<Order> example = generateStatusExample(status);
         Order[] orders = orderRepo.findAll(example).toArray(new Order[0]);
         return modelMapper.map(orders, OrderResponse[].class);
     }
-    public boolean deleteOrder(int id) {
-        try {
-            orderRepo.deleteById(id);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+
+    public void deleteOrder(int id) {
+        orderRepo.deleteById(id);
     }
 }

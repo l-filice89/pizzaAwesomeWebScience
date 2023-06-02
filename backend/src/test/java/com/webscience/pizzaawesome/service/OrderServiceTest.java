@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -221,5 +222,54 @@ public class OrderServiceTest {
         OrderRequest finalUpdateRequest3 = updateRequest;
         assertThrows(IllegalArgumentException.class, () -> orderService.updateOrderStatus(finalUpdateRequest3));
         orderService.deleteOrder(orderResponse.getId());
+    }
+
+    @Test
+    void testGetOrderById() {
+        OrderResponse orderResponse = orderService.placeOrder(orderRequest);
+        OrderResponse orderResponseById = orderService.getOrderById(orderResponse.getId());
+        assertEquals(orderResponse.getId(), orderResponseById.getId());
+        orderService.deleteOrder(orderResponse.getId());
+    }
+
+    @Test
+    void testGetOngoingOrders() {
+        for (int i = 0; i < 3; i++) {
+            orderService.placeOrder(orderRequest);
+        }
+        OrderResponse[] orderResponses = orderService.getOrders();
+        OrderRequest updateRequest = modelMapper.map(orderResponses[0], OrderRequest.class);
+        updateRequest.setStatus("preparing");
+        orderService.updateOrderStatus(updateRequest);
+        updateRequest.setStatus("delivering");
+        orderService.updateOrderStatus(updateRequest);
+        updateRequest = modelMapper.map(orderResponses[1], OrderRequest.class);
+        updateRequest.setStatus("preparing");
+        orderService.updateOrderStatus(updateRequest);
+        OrderResponse[] ongoingOrders = orderService.getOngoingOrders();
+        assertEquals(2, ongoingOrders.length);
+        for(OrderResponse orderResponse : orderResponses) {
+            orderService.deleteOrder(orderResponse.getId());
+        }
+    }
+
+    @Test
+    void testGetOrderByStatus(){
+        OrderResponse orderResponse = orderService.placeOrder(orderRequest);
+        OrderRequest updateRequest = modelMapper.map(orderResponse, OrderRequest.class);
+        updateRequest.setStatus("cancelled");
+        orderService.updateOrderStatus(updateRequest);
+        OrderResponse[] cancelledOrders = orderService.getOrdersByStatus("cancelled");
+        assertNotNull(cancelledOrders);
+        assertEquals(1, cancelledOrders.length);
+        orderService.deleteOrder(orderResponse.getId());
+    }
+
+    @Test
+    void testDeletion(){
+        OrderResponse orderResponse = orderService.placeOrder(orderRequest);
+        assertNotNull(orderService.getOrderById(orderResponse.getId()));
+        orderService.deleteOrder(orderResponse.getId());
+        assertThrows(NoSuchElementException.class, () -> orderService.getOrderById(orderResponse.getId()));
     }
 }

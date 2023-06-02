@@ -85,11 +85,19 @@ public class OrderController {
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<OrderResponse[]> getQueryByStatus(@PathVariable String status){
+    public ResponseEntity<OrderResponse[]> getOrderByStatus(@PathVariable String status){
 
-     	OrderResponse[] orders = orderService.getQueryByStatus(status);
+     	OrderResponse[] orders = orderService.getOrdersByStatus(status);
 
      	return ResponseEntity.status(HttpStatus.OK).body(orders);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteOrderById(@PathVariable int id) {
+
+            orderService.deleteOrder(id);
+
+            return ResponseEntity.status(HttpStatus.OK).body("Order n. " + id +  " deleted successfully");
     }
 
     @ExceptionHandler(RuntimeException.class)

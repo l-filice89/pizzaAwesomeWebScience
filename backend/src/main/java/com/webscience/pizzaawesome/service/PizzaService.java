@@ -52,4 +52,8 @@ public class PizzaService {
 
         return modelMapper.map(pizzaEntity, PizzaResponse.class);
     }
+
+    public void deletePizza(int id) {
+        pizzaRepo.deleteById(id);
+    }
 }

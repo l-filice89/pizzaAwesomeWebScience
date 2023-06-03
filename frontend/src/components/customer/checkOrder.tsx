@@ -1,6 +1,5 @@
 import React from "react";
 import {useFormik} from "formik";
-import {OrderResponse} from "../../../gen/api";
 import {getOrderById} from "../../services/orderService";
 
 interface iValues {
@@ -15,7 +14,7 @@ export const CheckOrder: React.FunctionComponent = () => {
 
     const [orderStatus, setOrder] = React.useState<String>();
 
-    const {values, handleChange, handleBlur, touched, errors, setFieldValue, handleSubmit, isValid} = useFormik({
+    const {values, handleChange, handleBlur, touched, errors, handleSubmit} = useFormik({
         initialValues: initialValues,
         onSubmit: () => {
             getOrderById(values.orderId).then((response) => {

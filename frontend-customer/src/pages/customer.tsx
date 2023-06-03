@@ -8,7 +8,7 @@ import {Navigation} from "../components/customer/order/navigation";
 
 export const PizzasContext = createContext<PizzaResponse[]>([]);
 export const Customer: React.FunctionComponent = () => {
-    
+
     const [pizzas, setPizzas] = useState<PizzaResponse[]>([]);
 
     useEffect(() => {

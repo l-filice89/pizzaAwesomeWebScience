@@ -39,7 +39,8 @@ export const PlaceOrder: React.FunctionComponent = () => {
         errors,
         setFieldValue,
         handleSubmit,
-        isValid
+        isValid,
+        resetForm
     } = useFormik({
         initialValues: initialValues,
         onSubmit: () => {
@@ -56,6 +57,8 @@ export const PlaceOrder: React.FunctionComponent = () => {
                 console.log(r)
                 setOrderId(r.id);
                 setIsOpen(true);
+                resetForm();
+                setOrderedPizzas([]);
             });
         },
         validationSchema: validationSchema

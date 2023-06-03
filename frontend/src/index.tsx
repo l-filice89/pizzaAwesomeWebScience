@@ -2,9 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
 import './index.css';
-import {BrowserRouter, Route, Routes} from "react-router-dom";
-import {Menu} from "./pages/menu";
-import {Order} from "./pages/order";
+import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
+import {Customer} from "./pages/customer";
+import {Kitchen} from "./pages/kitchen";
+import {PlaceOrder} from "./components/customer/placeOrder";
+import {CheckOrder} from "./components/customer/checkOrder";
 
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
@@ -12,8 +14,12 @@ const root = ReactDOM.createRoot(
 root.render(
     <BrowserRouter>
         <Routes>
-            <Route path="/" element={<Menu/>}/>
-            <Route path="/order" element={<Order/>}/>
+            <Route path="/" element={<Navigate to="/customer/order/place"/>}/>
+            <Route path="customer" element={<Customer/>}>
+                <Route path="order/place" element={<PlaceOrder/>}/>
+                <Route path="order/check" element={<CheckOrder/>}/>
+            </Route>
+            <Route path="kitchen" element={<Kitchen/>}/>
         </Routes>
     </BrowserRouter>
 );
